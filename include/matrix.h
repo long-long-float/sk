@@ -38,6 +38,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
+#include <cstring>
 
 #define PI 3.1415926535897932384626
 #define SQRT2 1.41421356237309504880169
@@ -46,7 +47,7 @@
 //#define SWAP(a,b) {temp=a;a=b;b=temp;}
 
 template <typename Z> static Z gconj(const Z &other) { return other; }
-template <> static std::complex<double>
+template <> std::complex<double>
 gconj<std::complex<double> >(const std::complex<double> & other) {
 	 return std::conj(other);
 }
@@ -120,7 +121,8 @@ public:
 	#ifdef _MSC_VER
 	friend std::ostream& operator<<(std::ostream&, const Matrix<Z>&);
 	#else
-	friend std::ostream& operator<<<>(std::ostream&, const Matrix&);
+	template <typename ZZ>
+	friend std::ostream& operator<<(std::ostream&, const Matrix<ZZ>&);
 	#endif
 
 	//! Dump matrix to filename	
@@ -358,8 +360,8 @@ template<typename Z> void Matrix<Z>::dump(const char *fn) {
 		exit(0);
 	}
 
-	out_file.write(static_cast<unsigned int *>(&M),sizeof(unsigned int));
-	out_file.write(static_cast<unsigned int *>(&N),sizeof(unsigned int));
+	out_file.write(reinterpret_cast<char *>(&M),sizeof(unsigned int));
+	out_file.write(reinterpret_cast<char *>(&N),sizeof(unsigned int));
 
 	out_file.write(A,N*M*sizeof(Z));
 
@@ -384,8 +386,8 @@ template<typename Z> void Matrix<Z>::read(const char *fn) {
 		exit(0);
 	}
 
-	in_file.read(static_cast<unsigned int *>(&m),sizeof(unsigned int));
-	in_file.read(static_cast<unsigned int *>(&n),sizeof(unsigned int));
+	in_file.read(reinterpret_cast<char *>(&m),sizeof(unsigned int));
+	in_file.read(reinterpret_cast<char *>(&n),sizeof(unsigned int));
 
 	// resize if necessary	
 	if (n<N || m<M) {

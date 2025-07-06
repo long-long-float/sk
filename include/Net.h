@@ -7,6 +7,7 @@
 #include <string>
 #include <complex>
 #include <iostream>
+#include <cstring>
 
 #include "matrix.h"
 #include "su2_cmp.h"
